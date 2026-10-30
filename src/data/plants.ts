@@ -20,6 +20,18 @@ export function createPlantsRepo(db: PotlyDb = defaultDb, clock: () => number = 
       return plant;
     },
 
+    /** All-or-nothing bulk add (CSV import). Every input is validated before anything is written. */
+    async createMany(inputs: readonly PlantInput[]): Promise<Plant[]> {
+      const now = clock();
+      const plants = inputs.map((input, i) => {
+        const plant = buildPlant(newId(), input, now + i);
+        plantSchema.parse(plant);
+        return plant;
+      });
+      await db.plants.bulkAdd(plants);
+      return plants;
+    },
+
     async get(id: string): Promise<Plant | undefined> {
       return db.plants.get(id);
     },

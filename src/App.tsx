@@ -8,6 +8,9 @@ import { QuickAddPage } from './features/plants/QuickAddPage';
 import { SchedulePage } from './features/plants/SchedulePage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { TodayPage } from './features/today/TodayPage';
+import { PwaBanner } from './pwa/PwaBanner';
+import { useOnlineStatus } from './pwa/useOnlineStatus';
+import { useReminders } from './pwa/useReminders';
 import { UndoProvider } from './ui/UndoProvider';
 
 function NotFound() {
@@ -20,12 +23,16 @@ function NotFound() {
 }
 
 export function AppRoutes() {
+  useReminders();
+  const online = useOnlineStatus();
   return (
     <UndoProvider>
     <div className="app">
       <header className="app-header">
         <span className="app-name">{fa.appName}</span>
+        {!online && <span className="offline-badge" title={fa.pwa.offlineHint}>{fa.pwa.offline}</span>}
       </header>
+      <PwaBanner />
       <main className="app-main">
         <Routes>
           <Route path="/" element={<TodayPage />} />

@@ -8,6 +8,11 @@ import { fa } from '../../i18n/fa';
 import { formatDate } from '../../ui/format';
 import { useNow } from '../../ui/useNow';
 import { useSettings } from '../../ui/useSettings';
+import { BackupSection } from './BackupSection';
+import { CsvImportSection } from './CsvImportSection';
+import { DemoSection } from './DemoSection';
+import { InstallSection } from './InstallSection';
+import { NotificationsSection } from './NotificationsSection';
 
 const ZONES: readonly string[] = (() => {
   try {
@@ -23,8 +28,12 @@ export function SettingsPage() {
     <section aria-labelledby="page-title">
       <h1 id="page-title">{fa.settings.title}</h1>
       {settings && <ScheduleSettingsForm settings={settings} />}
+      {settings && <NotificationsSection settings={settings} />}
+      {settings && <BackupSection settings={settings} />}
+      <CsvImportSection />
+      <DemoSection />
+      <InstallSection />
       <p className="muted">{fa.settings.localOnly}</p>
-      <p className="muted">{fa.settings.comingSoon}</p>
     </section>
   );
 }

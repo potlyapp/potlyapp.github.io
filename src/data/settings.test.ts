@@ -58,3 +58,18 @@ describe('plantsRepo.setCare', () => {
     expect((await plantsRepo.get(plant.id))?.care.spring.water.mode).toBe('unknown');
   });
 });
+
+describe('notification settings', () => {
+  it('default to off with no day recorded', async () => {
+    const s = await settingsRepo.get();
+    expect(s.notificationsEnabled).toBe(false);
+    expect(s.lastNotifiedDay).toBeNull();
+  });
+
+  it('persist enabled flag and last notified day', async () => {
+    await settingsRepo.update({ notificationsEnabled: true, lastNotifiedDay: '2026-03-21' });
+    const s = await settingsRepo.get();
+    expect(s.notificationsEnabled).toBe(true);
+    expect(s.lastNotifiedDay).toBe('2026-03-21');
+  });
+});

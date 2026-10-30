@@ -57,6 +57,8 @@ export const plantSchema = z.object({
   createdAt: z.number().int(),
   updatedAt: z.number().int(),
   archivedAt: z.number().int().nullable(),
+  /** Sample plant loaded from Settings; removable in one action. Absent on real plants. */
+  demo: z.literal(true).optional(),
 });
 export type Plant = z.infer<typeof plantSchema>;
 export type Light = Plant['light'];

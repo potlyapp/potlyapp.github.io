@@ -22,6 +22,10 @@ export const appSettingsSchema = z.object({
     .string()
     .nullable()
     .refine((v) => v === null || normalizeBaseUrl(v) === v, 'invalid base URL'),
+  /** Opt-in reminder notification while the app is open. Needs browser permission too. */
+  notificationsEnabled: z.boolean(),
+  /** Day key of the last reminder shown, so it fires at most once per day. */
+  lastNotifiedDay: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
 });
 export type AppSettings = z.infer<typeof appSettingsSchema>;
 
@@ -31,6 +35,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   checkedMoistGapDays: 2,
   lastSeenSeason: null,
   baseUrl: null,
+  notificationsEnabled: false,
+  lastNotifiedDay: null,
 };
 
 export const appSettingsPatchSchema = appSettingsSchema.partial();

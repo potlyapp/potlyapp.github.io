@@ -109,7 +109,10 @@ export function PlantDetailPage() {
       <div className="detail-head">
         <PlantThumb plantId={plant.id} large />
         <div>
-          <h1 id="page-title">{plant.name}</h1>
+          <h1 id="page-title">
+            {plant.name}
+            {plant.demo && <span className="badge badge-demo">{fa.demo.badge}</span>}
+          </h1>
           <div className="form-actions">
             <Link to={`/plants/${plant.id}/edit`} className="btn">{fa.detail.edit}</Link>
             <Link to="/plants" className="btn btn-quiet">{fa.detail.back}</Link>

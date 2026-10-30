@@ -33,6 +33,7 @@ function PlantRow({ plant }: { plant: Plant }) {
         <PlantThumb plantId={plant.id} />
         <span className="plant-row-text">
           <strong>{plant.name}</strong>
+          {plant.demo && <span className="badge badge-demo">{fa.demo.badge}</span>}
           {(plant.species || plant.room) && (
             <span className="muted">{[plant.species, plant.room].filter(Boolean).join(' · ')}</span>
           )}
