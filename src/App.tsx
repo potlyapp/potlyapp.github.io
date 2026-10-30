@@ -1,4 +1,4 @@
-import { HashRouter, NavLink, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Routes, Link } from 'react-router-dom';
 import { fa } from './i18n/fa';
 
 function Page({ title, children }: { title: string; children: string }) {
@@ -44,8 +44,8 @@ export function AppRoutes() {
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <AppRoutes />
-    </HashRouter>
+    </BrowserRouter>
   );
 }
