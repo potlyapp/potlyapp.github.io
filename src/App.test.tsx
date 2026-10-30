@@ -8,9 +8,9 @@ describe('App shell', () => {
     window.history.pushState({}, '', '/');
   });
 
-  it('renders the Today page with navigation', () => {
+  it('renders the Today page with navigation', async () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: fa.today.title })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: fa.today.title })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: fa.nav.primary })).toBeInTheDocument();
   });
 

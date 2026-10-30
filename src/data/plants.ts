@@ -27,6 +27,34 @@ export function createPlantsRepo(db: PotlyDb = defaultDb, clock: () => number = 
       return all.filter((p) => p.archivedAt === null).sort((a, b) => a.createdAt - b.createdAt);
     },
 
+    async listArchived(): Promise<Plant[]> {
+      const all = await db.plants.toArray();
+      return all.filter((p) => p.archivedAt !== null).sort((a, b) => a.createdAt - b.createdAt);
+    },
+
+    /** Hides the plant from lists and Today; history and photo are kept. */
+    async archive(id: string): Promise<void> {
+      const now = clock();
+      if ((await db.plants.update(id, { archivedAt: now, updatedAt: now })) === 0) {
+        throw new Error(`Plant not found: ${id}`);
+      }
+    },
+
+    async unarchive(id: string): Promise<void> {
+      if ((await db.plants.update(id, { archivedAt: null, updatedAt: clock() })) === 0) {
+        throw new Error(`Plant not found: ${id}`);
+      }
+    },
+
+    /** Permanent. Removes the plant together with its photo and care history. */
+    async remove(id: string): Promise<void> {
+      await db.transaction('rw', db.plants, db.photos, db.events, async () => {
+        await db.events.where('plantId').equals(id).delete();
+        await db.photos.delete(id);
+        await db.plants.delete(id);
+      });
+    },
+
     async update(id: string, patch: PlantPatch): Promise<Plant> {
       const existing = await db.plants.get(id);
       if (!existing) throw new Error(`Plant not found: ${id}`);

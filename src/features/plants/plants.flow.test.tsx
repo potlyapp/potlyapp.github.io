@@ -47,7 +47,7 @@ describe('plants flow', () => {
     await userEvent.type(name, 'اول');
     await userEvent.click(screen.getByRole('button', { name: fa.form.saveAndAnother }));
 
-    expect(await screen.findByRole('status')).toHaveTextContent(fa.form.saved('اول'));
+    expect(await screen.findByText(fa.form.saved('اول'))).toBeInTheDocument();
     expect(window.location.pathname).toBe('/plants/new');
     await waitFor(() => expect(screen.getByLabelText(fa.form.name)).toHaveValue(''));
 
@@ -73,7 +73,8 @@ describe('plants flow', () => {
     await userEvent.selectOptions(screen.getByLabelText(fa.form.light), 'bright');
     await userEvent.click(screen.getByRole('button', { name: fa.form.save }));
 
-    await screen.findByRole('link', { name: /جدید/ });
+    expect(await screen.findByRole('heading', { name: 'جدید', level: 1 })).toBeInTheDocument();
+    expect(window.location.pathname).toBe(`/p/${plant.id}`);
     const saved = await plantsRepo.get(plant.id);
     expect(saved?.name).toBe('جدید');
     expect(saved?.room).toBe('آشپزخانه');

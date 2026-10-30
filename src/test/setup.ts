@@ -8,4 +8,5 @@ afterEach(async () => {
   cleanup();
   await db.plants.clear();
   await db.photos.clear();
+  await db.events.clear();
 });

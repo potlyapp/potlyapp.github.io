@@ -1,8 +1,11 @@
 import { BrowserRouter, NavLink, Route, Routes, Link } from 'react-router-dom';
 import { fa } from './i18n/fa';
 import { EditPlantPage } from './features/plants/EditPlantPage';
+import { PlantDetailPage } from './features/plants/PlantDetailPage';
 import { PlantsPage } from './features/plants/PlantsPage';
 import { QuickAddPage } from './features/plants/QuickAddPage';
+import { TodayPage } from './features/today/TodayPage';
+import { UndoProvider } from './ui/UndoProvider';
 
 function Page({ title, children }: { title: string; children: string }) {
   return (
@@ -24,14 +27,16 @@ function NotFound() {
 
 export function AppRoutes() {
   return (
+    <UndoProvider>
     <div className="app">
       <header className="app-header">
         <span className="app-name">{fa.appName}</span>
       </header>
       <main className="app-main">
         <Routes>
-          <Route path="/" element={<Page title={fa.today.title}>{fa.today.comingSoon}</Page>} />
+          <Route path="/" element={<TodayPage />} />
           <Route path="/plants" element={<PlantsPage />} />
+          <Route path="/p/:id" element={<PlantDetailPage />} />
           <Route path="/plants/new" element={<QuickAddPage />} />
           <Route path="/plants/:id/edit" element={<EditPlantPage />} />
           <Route path="/settings" element={<Page title={fa.settings.title}>{fa.settings.comingSoon}</Page>} />
@@ -44,6 +49,7 @@ export function AppRoutes() {
         <NavLink to="/settings">{fa.nav.settings}</NavLink>
       </nav>
     </div>
+    </UndoProvider>
   );
 }
 

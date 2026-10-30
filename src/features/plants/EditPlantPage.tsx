@@ -36,7 +36,7 @@ export function EditPlantPage() {
     try {
       await plantsRepo.update(id, valuesToInput(values));
       await applyPhoto(id, photo, removePhoto);
-      navigate('/plants');
+      navigate(`/p/${id}`);
       return true;
     } catch {
       setError(fa.form.saveFailed);
@@ -62,7 +62,7 @@ export function EditPlantPage() {
         hasExistingPhoto={load.hasPhoto}
         error={error}
         onSubmit={handleSubmit}
-        onCancel={() => navigate('/plants')}
+        onCancel={() => navigate(`/p/${id}`)}
       />
     </section>
   );
