@@ -1,5 +1,6 @@
 import { BrowserRouter, NavLink, Route, Routes, Link } from 'react-router-dom';
 import { fa } from './i18n/fa';
+import { LabelsPage } from './features/labels/LabelsPage';
 import { EditPlantPage } from './features/plants/EditPlantPage';
 import { PlantDetailPage } from './features/plants/PlantDetailPage';
 import { PlantsPage } from './features/plants/PlantsPage';
@@ -34,6 +35,7 @@ export function AppRoutes() {
           <Route path="/plants/:id/edit" element={<EditPlantPage />} />
           <Route path="/p/:id/schedule" element={<SchedulePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/labels" element={<LabelsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

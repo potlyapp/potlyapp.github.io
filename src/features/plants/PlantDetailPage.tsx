@@ -13,6 +13,7 @@ import { PlantThumb } from '../../ui/PlantThumb';
 import { useNow } from '../../ui/useNow';
 import { useSettings } from '../../ui/useSettings';
 import { useUndo } from '../../ui/UndoProvider';
+import { QrSection } from './QrSection';
 
 type Load = { state: 'missing' } | { state: 'ready'; plant: Plant };
 
@@ -43,8 +44,9 @@ export function PlantDetailPage() {
   if (load.state === 'missing') {
     return (
       <section aria-labelledby="page-title">
-        <h1 id="page-title">{fa.form.notFound}</h1>
-        <Link to="/plants">{fa.detail.back}</Link>
+        <h1 id="page-title">{fa.qr.notFoundTitle}</h1>
+        <p>{fa.qr.notFoundBody}</p>
+        <Link to="/plants" className="btn">{fa.qr.goPlants}</Link>
       </section>
     );
   }
@@ -175,6 +177,8 @@ export function PlantDetailPage() {
           </div>
         )}
       </dl>
+
+      <QrSection plant={plant} />
 
       <h2>{fa.history.title}</h2>
       <p className="muted">{fa.history.note}</p>

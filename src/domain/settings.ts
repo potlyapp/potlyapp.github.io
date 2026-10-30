@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { normalizeBaseUrl } from './qr';
 import { seasonSchema } from './schemas';
 
 export function isValidTimeZone(tz: string): boolean {
@@ -16,6 +17,11 @@ export const appSettingsSchema = z.object({
   checkedMoistGapDays: z.number().int().min(1).max(30),
   /** Season the user has already been told about; drives the season-change banner. */
   lastSeenSeason: seasonSchema.nullable(),
+  /** Origin encoded in QR codes. `null` means "the origin this app is running on". */
+  baseUrl: z
+    .string()
+    .nullable()
+    .refine((v) => v === null || normalizeBaseUrl(v) === v, 'invalid base URL'),
 });
 export type AppSettings = z.infer<typeof appSettingsSchema>;
 
@@ -24,6 +30,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   calendar: 'persian',
   checkedMoistGapDays: 2,
   lastSeenSeason: null,
+  baseUrl: null,
 };
 
 export const appSettingsPatchSchema = appSettingsSchema.partial();

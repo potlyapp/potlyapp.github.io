@@ -191,7 +191,7 @@ describe('Plant detail page', () => {
   it('shows not-found for an unknown id', async () => {
     go('/p/AAAAAAAAAAAAAAAAAAAAAA');
     render(<App />);
-    expect(await screen.findByRole('heading', { name: fa.form.notFound })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: fa.qr.notFoundTitle })).toBeInTheDocument();
   });
 });
 
