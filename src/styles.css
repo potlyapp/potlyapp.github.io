@@ -228,3 +228,15 @@ h2 { font-size: 1.1rem; }
 .struck { text-decoration: line-through; }
 .badge { padding: 2px 8px; border-radius: 999px; background: var(--color-border); color: var(--color-text); font-size: 0.85rem; }
 .danger-zone { margin-block-start: calc(var(--space) * 2); }
+
+.season-set {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-block: 0.75rem;
+}
+.season-set legend { padding-inline: 0.5rem; font-weight: 600; }
+.season-set .badge { margin-inline-start: 0.5rem; }
+.schedule-row { display: grid; gap: 0.5rem; margin-block-end: 0.75rem; }
+.season-banner { margin-block-end: 1rem; }
+.season-banner p { margin-block: 0.25rem; }

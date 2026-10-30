@@ -9,21 +9,21 @@ import {
 } from '../domain/events';
 import { newId } from '../domain/id';
 import { seasonFor } from '../domain/season';
-import { DEFAULT_SCHEDULE_SETTINGS, type ScheduleSettings } from '../domain/tasks';
+import type { ScheduleSettings } from '../domain/tasks';
 import { db as defaultDb, type PotlyDb } from './db';
+import { createSettingsRepo } from './settings';
 
 export function createEventsRepo(
   db: PotlyDb = defaultDb,
   clock: () => number = Date.now,
-  getSettings: () => ScheduleSettings = () => DEFAULT_SCHEDULE_SETTINGS,
+  getSettings: () => Promise<ScheduleSettings> = () => createSettingsRepo(db).get(),
 ) {
   async function refreshCaches(plantId: string): Promise<void> {
     const events = await db.events.where('plantId').equals(plantId).toArray();
     await db.plants.update(plantId, deriveCaches(events));
   }
 
-  async function append(input: RecordInput): Promise<CareEvent> {
-    const settings = getSettings();
+  async function append(input: RecordInput, settings: ScheduleSettings): Promise<CareEvent> {
     const at = clock();
     const event = careEventSchema.parse({
       id: newId(),
@@ -44,9 +44,10 @@ export function createEventsRepo(
   return {
     /** Append one event. Events are never edited or deleted (except with the whole plant). */
     async record(input: RecordInput): Promise<CareEvent> {
+      const settings = await getSettings();
       return db.transaction('rw', db.events, db.plants, async () => {
         if (!(await db.plants.get(input.plantId))) throw new Error(`Plant not found: ${input.plantId}`);
-        return append(input);
+        return append(input, settings);
       });
     },
 
@@ -55,31 +56,33 @@ export function createEventsRepo(
       items: ReadonlyArray<{ plantId: string; task: Task }>,
       input: Omit<RecordInput, 'plantId' | 'task'>,
     ): Promise<CareEvent[]> {
+      const settings = await getSettings();
       return db.transaction('rw', db.events, db.plants, async () => {
         const out: CareEvent[] = [];
         for (const item of items) {
           if (!(await db.plants.get(item.plantId))) throw new Error(`Plant not found: ${item.plantId}`);
-          out.push(await append({ ...input, ...item }));
+          out.push(await append({ ...input, ...item }, settings));
         }
         return out;
       });
     },
 
     async snooze(plantId: string, task: Task, days: number): Promise<CareEvent> {
-      const settings = getSettings();
+      const settings = await getSettings();
       const until = addDays(dayKey(clock(), settings.timeZone), days);
       return this.record({ plantId, task, kind: 'snoozed', snoozeUntilDay: until });
     },
 
     /** Cancels an event by appending an `undo` marker; the original stays in history. */
     async undo(eventId: string): Promise<CareEvent> {
+      const settings = await getSettings();
       return db.transaction('rw', db.events, db.plants, async () => {
         const target = await db.events.get(eventId);
         if (!target) throw new Error(`Event not found: ${eventId}`);
         if (target.kind === 'undo') throw new Error('Cannot undo an undo');
         const existing = await db.events.where('plantId').equals(target.plantId).toArray();
         if (undoneIds(existing).has(eventId)) throw new Error('Already undone');
-        return append({ plantId: target.plantId, task: target.task, kind: 'undo', undoesId: eventId });
+        return append({ plantId: target.plantId, task: target.task, kind: 'undo', undoesId: eventId }, settings);
       });
     },
 

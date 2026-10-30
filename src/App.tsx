@@ -4,17 +4,10 @@ import { EditPlantPage } from './features/plants/EditPlantPage';
 import { PlantDetailPage } from './features/plants/PlantDetailPage';
 import { PlantsPage } from './features/plants/PlantsPage';
 import { QuickAddPage } from './features/plants/QuickAddPage';
+import { SchedulePage } from './features/plants/SchedulePage';
+import { SettingsPage } from './features/settings/SettingsPage';
 import { TodayPage } from './features/today/TodayPage';
 import { UndoProvider } from './ui/UndoProvider';
-
-function Page({ title, children }: { title: string; children: string }) {
-  return (
-    <section aria-labelledby="page-title">
-      <h1 id="page-title">{title}</h1>
-      <p>{children}</p>
-    </section>
-  );
-}
 
 function NotFound() {
   return (
@@ -39,7 +32,8 @@ export function AppRoutes() {
           <Route path="/p/:id" element={<PlantDetailPage />} />
           <Route path="/plants/new" element={<QuickAddPage />} />
           <Route path="/plants/:id/edit" element={<EditPlantPage />} />
-          <Route path="/settings" element={<Page title={fa.settings.title}>{fa.settings.comingSoon}</Page>} />
+          <Route path="/p/:id/schedule" element={<SchedulePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

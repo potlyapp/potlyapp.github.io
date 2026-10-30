@@ -5,10 +5,12 @@ import { eventsRepo } from '../../data/events';
 import { plantsRepo } from '../../data/plants';
 import { addDays, dayKey } from '../../domain/dayKey';
 import type { EventKind, Task } from '../../domain/events';
-import { computeTasks, DEFAULT_SCHEDULE_SETTINGS, type DueTask } from '../../domain/tasks';
+import { computeTasks, type DueTask } from '../../domain/tasks';
 import { fa } from '../../i18n/fa';
 import { ConfirmPanel } from '../../ui/ConfirmPanel';
 import { useNow } from '../../ui/useNow';
+import { useSettings } from '../../ui/useSettings';
+import { SeasonBanner } from './SeasonBanner';
 import { useUndo } from '../../ui/UndoProvider';
 
 type BulkKind = Extract<EventKind, 'done' | 'snoozed' | 'skipped'>;
@@ -31,6 +33,7 @@ function sortDue(a: DueTask, b: DueTask): number {
 export function TodayPage() {
   const plants = useLiveQuery(() => plantsRepo.list(), []);
   const events = useLiveQuery(() => eventsRepo.listAll(), []);
+  const settings = useSettings();
   const now = useNow();
   const undo = useUndo();
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
@@ -40,18 +43,18 @@ export function TodayPage() {
 
   const names = useMemo(() => new Map((plants ?? []).map((p) => [p.id, p.name])), [plants]);
   const due = useMemo(() => {
-    if (!plants || !events) return null;
-    return computeTasks(plants, events, now)
+    if (!plants || !events || !settings) return null;
+    return computeTasks(plants, events, now, settings)
       .filter((t) => t.status !== 'upcoming')
       .sort(sortDue);
-  }, [plants, events, now]);
+  }, [plants, events, now, settings]);
 
-  if (!due) return null;
+  if (!due || !settings || !plants) return null;
 
   const chosen = due.filter((t) => selected.has(rowKey(t)));
   const overdue = due.filter((t) => t.status === 'overdue');
   const today = due.filter((t) => t.status === 'today');
-  const tomorrow = () => addDays(dayKey(now, DEFAULT_SCHEDULE_SETTINGS.timeZone), 1);
+  const tomorrow = () => addDays(dayKey(now, settings.timeZone), 1);
 
   function toggle(t: DueTask) {
     const next = new Set(selected);
@@ -136,6 +139,7 @@ export function TodayPage() {
   return (
     <section aria-labelledby="page-title">
       <h1 id="page-title">{fa.today.title}</h1>
+      <SeasonBanner settings={settings} plants={plants} now={now} />
       {error && <p role="alert" className="form-error">{error}</p>}
 
       {due.length === 0 && (

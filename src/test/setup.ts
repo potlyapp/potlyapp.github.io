@@ -9,4 +9,5 @@ afterEach(async () => {
   await db.plants.clear();
   await db.photos.clear();
   await db.events.clear();
+  await db.settings.clear();
 });

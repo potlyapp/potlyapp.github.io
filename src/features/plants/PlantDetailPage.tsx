@@ -4,15 +4,15 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { eventsRepo } from '../../data/events';
 import { plantsRepo } from '../../data/plants';
 import { undoneIds, type CareEvent, type Task } from '../../domain/events';
-import { DEFAULT_SCHEDULE_SETTINGS } from '../../domain/tasks';
-import type { Plant } from '../../domain/schemas';
+import { seasonFor } from '../../domain/season';
+import type { Plant, TaskSetting } from '../../domain/schemas';
 import { fa } from '../../i18n/fa';
 import { ConfirmPanel } from '../../ui/ConfirmPanel';
 import { formatDateTime } from '../../ui/format';
 import { PlantThumb } from '../../ui/PlantThumb';
+import { useNow } from '../../ui/useNow';
+import { useSettings } from '../../ui/useSettings';
 import { useUndo } from '../../ui/UndoProvider';
-
-const TZ = DEFAULT_SCHEDULE_SETTINGS.timeZone;
 
 type Load = { state: 'missing' } | { state: 'ready'; plant: Plant };
 
@@ -20,14 +20,17 @@ function eventLabel(e: CareEvent): string {
   return fa.history.kind[e.kind][e.task];
 }
 
-function when(at: number | null): string {
-  return at === null ? fa.detail.never : formatDateTime(at, TZ);
+function summary(s: TaskSetting): string {
+  if (s.mode === 'interval') return fa.schedule.summaryInterval(s.everyDays);
+  return s.mode === 'inactive' ? fa.schedule.summaryInactive : fa.schedule.summaryUnknown;
 }
 
 export function PlantDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const undo = useUndo();
+  const settings = useSettings();
+  const now = useNow();
   const load = useLiveQuery<Load>(async () => {
     const plant = await plantsRepo.get(id);
     return plant ? { state: 'ready', plant } : { state: 'missing' };
@@ -36,7 +39,7 @@ export function PlantDetailPage() {
   const [confirm, setConfirm] = useState<'archive' | 'remove' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  if (!load || !events) return null;
+  if (!load || !events || !settings) return null;
   if (load.state === 'missing') {
     return (
       <section aria-labelledby="page-title">
@@ -47,6 +50,11 @@ export function PlantDetailPage() {
   }
 
   const { plant } = load;
+  const { timeZone: TZ, calendar } = settings;
+  const when = (at: number | null) => (at === null ? fa.detail.never : formatDateTime(at, TZ, calendar));
+  const season = seasonFor(now, TZ, calendar);
+  const careNow = plant.care[season];
+  const nothingSet = careNow.water.mode !== 'interval' && careNow.fertilize.mode !== 'interval';
   const archived = plant.archivedAt !== null;
   const undone = undoneIds(events);
 
@@ -138,6 +146,20 @@ export function PlantDetailPage() {
         <dd>{when(plant.lastFertilizedAt)}</dd>
       </dl>
 
+      <h2>{fa.schedule.summaryTitle} ({fa.seasons[season]})</h2>
+      <dl className="facts">
+        <div className="fact">
+          <dt>{fa.tasks.water}</dt>
+          <dd>{summary(careNow.water)}</dd>
+        </div>
+        <div className="fact">
+          <dt>{fa.tasks.fertilize}</dt>
+          <dd>{summary(careNow.fertilize)}</dd>
+        </div>
+      </dl>
+      {nothingSet && <p className="muted">{fa.schedule.noneSet}</p>}
+      <Link to={`/p/${plant.id}/schedule`} className="btn">{fa.schedule.edit}</Link>
+
       <h2>{fa.detail.info}</h2>
       <dl className="facts">
         {info.map(([k, v]) => (
@@ -165,7 +187,7 @@ export function PlantDetailPage() {
             return (
               <li key={e.id} className={isUndone || e.kind === 'undo' ? 'history-muted' : undefined}>
                 <span className={isUndone ? 'struck' : undefined}>{eventLabel(e)}</span>
-                <span className="muted"> · {formatDateTime(e.at, TZ)}</span>
+                <span className="muted"> · {formatDateTime(e.at, TZ, calendar)}</span>
                 {isUndone && <span className="badge">{fa.history.undone}</span>}
                 {!isUndone && e.kind !== 'undo' && (
                   <button

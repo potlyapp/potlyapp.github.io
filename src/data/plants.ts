@@ -1,8 +1,10 @@
 import { buildPlant } from '../domain/defaults';
 import { newId } from '../domain/id';
 import {
+  careSettingsSchema,
   plantPatchSchema,
   plantSchema,
+  type CareSettings,
   type Plant,
   type PlantInput,
   type PlantPatch,
@@ -53,6 +55,16 @@ export function createPlantsRepo(db: PotlyDb = defaultDb, clock: () => number = 
         await db.photos.delete(id);
         await db.plants.delete(id);
       });
+    },
+
+    /** Replaces the per-season care settings. Events are untouched, so history stays intact. */
+    async setCare(id: string, care: CareSettings): Promise<Plant> {
+      const existing = await db.plants.get(id);
+      if (!existing) throw new Error(`Plant not found: ${id}`);
+      const next: Plant = { ...existing, care: careSettingsSchema.parse(care), updatedAt: clock() };
+      plantSchema.parse(next);
+      await db.plants.put(next);
+      return next;
     },
 
     async update(id: string, patch: PlantPatch): Promise<Plant> {
