@@ -1,1 +1,11 @@
+import 'fake-indexeddb/auto';
 import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach } from 'vitest';
+import { db } from '../data/db';
+
+afterEach(async () => {
+  cleanup();
+  await db.plants.clear();
+  await db.photos.clear();
+});

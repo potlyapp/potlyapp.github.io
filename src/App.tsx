@@ -1,5 +1,8 @@
 import { BrowserRouter, NavLink, Route, Routes, Link } from 'react-router-dom';
 import { fa } from './i18n/fa';
+import { EditPlantPage } from './features/plants/EditPlantPage';
+import { PlantsPage } from './features/plants/PlantsPage';
+import { QuickAddPage } from './features/plants/QuickAddPage';
 
 function Page({ title, children }: { title: string; children: string }) {
   return (
@@ -28,7 +31,9 @@ export function AppRoutes() {
       <main className="app-main">
         <Routes>
           <Route path="/" element={<Page title={fa.today.title}>{fa.today.comingSoon}</Page>} />
-          <Route path="/plants" element={<Page title={fa.plants.title}>{fa.plants.comingSoon}</Page>} />
+          <Route path="/plants" element={<PlantsPage />} />
+          <Route path="/plants/new" element={<QuickAddPage />} />
+          <Route path="/plants/:id/edit" element={<EditPlantPage />} />
           <Route path="/settings" element={<Page title={fa.settings.title}>{fa.settings.comingSoon}</Page>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
