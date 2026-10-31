@@ -20,6 +20,23 @@ body { margin: 0; background: var(--color-bg); }
 
 :focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 
+.app-main:focus { outline: none; }
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 8px;
+  inset-block-start: -100px;
+  z-index: 100;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+}
+.skip-link:focus { inset-block-start: 8px; }
+
+.error-boundary { padding-block: var(--space); }
+
 .app {
   min-height: 100dvh;
   display: flex;

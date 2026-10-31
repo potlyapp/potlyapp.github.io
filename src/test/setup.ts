@@ -4,6 +4,8 @@ import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 import { db } from '../data/db';
 
+window.scrollTo = () => {};
+
 afterEach(async () => {
   cleanup();
   await db.plants.clear();

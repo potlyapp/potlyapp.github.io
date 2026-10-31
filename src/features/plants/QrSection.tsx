@@ -38,8 +38,8 @@ export function QrSection({ plant }: { plant: Plant }) {
   }
 
   return (
-    <>
-      <h2>{fa.qr.title}</h2>
+    <section aria-labelledby="qr-title">
+      <h2 id="qr-title">{fa.qr.title}</h2>
       <div className="qr-block">
         <QrCode text={url} alt={fa.qr.alt(plant.name)} />
         <div>
@@ -50,13 +50,13 @@ export function QrSection({ plant }: { plant: Plant }) {
             <p key={w} className="notice" role="note">{fa.settings.warn[w]}</p>
           ))}
           {error && <p role="alert" className="form-error">{fa.qr.failed}</p>}
-          <div className="form-actions">
+          <div className="form-actions" role="group" aria-labelledby="qr-title">
             <button type="button" className="btn" onClick={() => void save('svg')}>{fa.qr.downloadSvg}</button>
             <button type="button" className="btn" onClick={() => void save('png')}>{fa.qr.downloadPng}</button>
             <Link to="/labels" className="btn btn-quiet">{fa.qr.labels}</Link>
           </div>
         </div>
       </div>
-    </>
+    </section>
   );
 }

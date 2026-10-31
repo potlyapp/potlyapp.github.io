@@ -19,7 +19,7 @@ describe('plants flow', () => {
   it('saves a name-only plant and lists it', async () => {
     go('/plants/new');
     render(<App />);
-    await userEvent.type(screen.getByLabelText(fa.form.name), 'مونسترا');
+    await userEvent.type(await screen.findByLabelText(fa.form.name), 'مونسترا');
     await userEvent.click(screen.getByRole('button', { name: fa.form.save }));
 
     expect(await screen.findByRole('link', { name: /مونسترا/ })).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('plants flow', () => {
   it('blocks an empty name with an accessible error', async () => {
     go('/plants/new');
     render(<App />);
-    await userEvent.click(screen.getByRole('button', { name: fa.form.save }));
+    await userEvent.click(await screen.findByRole('button', { name: fa.form.save }));
     expect(screen.getByLabelText(fa.form.name)).toBeInvalid();
     expect(screen.getByText(fa.form.nameRequired)).toBeInTheDocument();
     expect(await plantsRepo.list()).toHaveLength(0);

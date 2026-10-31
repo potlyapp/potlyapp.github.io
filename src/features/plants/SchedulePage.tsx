@@ -103,7 +103,16 @@ function ScheduleForm({ plant }: { plant: Plant }) {
     setSaveError(null);
     const { care, errors: found } = buildCare(draft, plant.care);
     setErrors(found);
-    if (Object.keys(found).length > 0) return;
+    if (Object.keys(found).length > 0) {
+      for (const season of SEASONS) {
+        const task = TASKS.find((t) => found[`${season}.${t}`]);
+        if (task) {
+          document.getElementById(`sch-${season}-${task}-days`)?.focus();
+          return;
+        }
+      }
+      return;
+    }
     setBusy(true);
     try {
       await plantsRepo.setCare(plant.id, care);

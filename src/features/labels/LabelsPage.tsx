@@ -32,7 +32,7 @@ export function LabelsPage() {
       {plants.length === 0 ? (
         <p>{fa.labels.empty}</p>
       ) : (
-        <ul className="label-sheet" aria-label={fa.labels.title}>
+        <ul className="label-sheet" role="list" aria-label={fa.labels.title}>
           {plants.map((p) => (
             <li key={p.id} className="label">
               <QrCode text={plantUrl(info.baseUrl, p.id)} alt={fa.qr.alt(p.name)} size={120} />
